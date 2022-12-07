@@ -1,0 +1,45 @@
+ENTITY CLASS
+
+@GenericGenerator(name = "client_id", strategy = "com.ty.eliteCars.util.IdGenerator")
+    @GeneratedValue(generator = "client_id")  
+	@Column(name = "Id")
+	private String adminId;
+
+CONFIGURATION CLASS
+
+package com.ty.eliteCars.util;
+
+
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.id.IdentifierGenerator;
+
+public class IdGenerator implements IdentifierGenerator {
+
+	@Override
+	public Serializable generate(SharedSessionContractImplementor session, Object object) throws HibernateException {
+		String prefix = "TYSS";
+		String suffix = "";
+		Connection con = session.connection();
+		try {
+			Statement st=con.createStatement();
+			ResultSet resultSet=st.executeQuery("Select count(id) from Admin");
+			 if(resultSet.next()) {
+				    Integer id = resultSet.getInt(1) + 1;
+				    suffix = String.valueOf(id);
+				   }
+			 return prefix + suffix;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+}
